@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
+import redisClient from '../utils/redis';
+import dbClient from '../utils/db'; // Ensure this file exports a connected MongoDB client instance
 import fs from 'fs';
 import { promisify } from 'util';
 import path from 'path';
-import dbClient from '../utils/db'; // Ensure this file exports a connected MongoDB client instance
-import redisClient from '../utils/redis';
 
 const writeFileAsync = promisify(fs.writeFile);
 const mkdirAsync = promisify(fs.mkdir);
@@ -98,9 +98,9 @@ class FilesController {
     try {
       const file = await dbClient.files.findOne({ _id: new dbClient.ObjectId(id), userId });
       if (!file) return res.status(404).json({ error: 'Not found' });
-      res.json(file);
+      return res.json(file); // Ensure to return the response
     } catch (err) {
-      res.status(500).json({ error: 'Server error' });
+      return res.status(500).json({ error: 'Server error' }); // Ensure to return the response
     }
   }
 
@@ -119,11 +119,11 @@ class FilesController {
       const files = await dbClient.files.aggregate([
         { $match: { userId, parentId: new dbClient.ObjectId(parentId) } },
         { $skip: skip },
-        { $limit: limit },
+        { $limit: limit }
       ]).toArray();
-      res.json(files);
+      return res.json(files); // Ensure to return the response
     } catch (err) {
-      res.status(500).json({ error: 'Server error' });
+      return res.status(500).json({ error: 'Server error' }); // Ensure to return the response
     }
   }
 
@@ -140,14 +140,14 @@ class FilesController {
       const result = await dbClient.files.findOneAndUpdate(
         { _id: new dbClient.ObjectId(id), userId },
         { $set: { isPublic: true } },
-        { returnDocument: 'after' },
+        { returnDocument: 'after' }
       );
 
       if (!result.value) return res.status(404).json({ error: 'Not found' });
 
-      res.json(result.value);
+      return res.json(result.value); // Ensure to return the response
     } catch (err) {
-      res.status(500).json({ error: 'Server error' });
+      return res.status(500).json({ error: 'Server error' }); // Ensure to return the response
     }
   }
 
@@ -164,14 +164,14 @@ class FilesController {
       const result = await dbClient.files.findOneAndUpdate(
         { _id: new dbClient.ObjectId(id), userId },
         { $set: { isPublic: false } },
-        { returnDocument: 'after' },
+        { returnDocument: 'after' }
       );
 
       if (!result.value) return res.status(404).json({ error: 'Not found' });
 
-      res.json(result.value);
+      return res.json(result.value); // Ensure to return the response
     } catch (err) {
-      res.status(500).json({ error: 'Server error' });
+      return res.status(500).json({ error: 'Server error' }); // Ensure to return the response
     }
   }
 }
