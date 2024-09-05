@@ -1,9 +1,9 @@
 import { v4 as uuidv4 } from 'uuid';
-import redisClient from '../utils/redis';
-import dbClient from '../utils/db'; // Ensure this file exports a connected MongoDB client instance
 import fs from 'fs';
 import { promisify } from 'util';
 import path from 'path';
+import dbClient from '../utils/db'; // Ensure this file exports a connected MongoDB client instance
+import redisClient from '../utils/redis';
 
 const writeFileAsync = promisify(fs.writeFile);
 const mkdirAsync = promisify(fs.mkdir);
@@ -119,7 +119,7 @@ class FilesController {
       const files = await dbClient.files.aggregate([
         { $match: { userId, parentId: new dbClient.ObjectId(parentId) } },
         { $skip: skip },
-        { $limit: limit }
+        { $limit: limit },
       ]).toArray();
       res.json(files);
     } catch (err) {
