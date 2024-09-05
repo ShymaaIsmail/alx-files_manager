@@ -11,32 +11,30 @@ class DBClient {
   }
 
   async connect() {
-    try {
-      await this.client.connect();
-      this.db = this.client.db();
-      return true;
-    } catch (error) {
-      console.error('Failed to connect to MongoDB', error);
-      return false;
+    if (!this.db) {
+      try {
+        await this.client.connect();
+        this.db = this.client.db();
+        return true;
+      } catch (error) {
+        console.error('Failed to connect to MongoDB:', error);
+        return false;
+      }
     }
+    return true;
   }
 
   async isAlive() {
-    const isConnected = await this.connect();
-    return isConnected;
+    return this.db !== null && this.client.isConnected();
   }
 
   async nbUsers() {
-    if (!this.db) {
-      await this.connect();
-    }
+    await this.connect();
     return this.db.collection('users').countDocuments();
   }
 
   async nbFiles() {
-    if (!this.db) {
-      await this.connect();
-    }
+    await this.connect();
     return this.db.collection('files').countDocuments();
   }
 }
